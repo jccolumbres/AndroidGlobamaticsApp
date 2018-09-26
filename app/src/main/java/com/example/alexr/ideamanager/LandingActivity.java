@@ -21,6 +21,8 @@ public class LandingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_landing);
 
         MessageService taskService = ServiceBuilder.buildService(MessageService.class);
+        //Uses a different base url basically uses two API sources
+        //Call<String> call = taskService.getMessagesFromDiffUrl("http://different.api.url.com/");
         Call<String> call = taskService.getMessages();
         call.enqueue(new Callback<String>() {
             @Override
