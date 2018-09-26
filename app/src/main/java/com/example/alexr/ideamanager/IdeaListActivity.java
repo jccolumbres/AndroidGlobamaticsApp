@@ -11,11 +11,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.alexr.ideamanager.helpers.SampleContent;
 import com.example.alexr.ideamanager.models.Idea;
+import com.example.alexr.ideamanager.services.IdeaService;
+import com.example.alexr.ideamanager.services.ServiceBuilder;
 
+import java.util.HashMap;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class IdeaListActivity extends AppCompatActivity {
 
@@ -47,7 +55,26 @@ public class IdeaListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(SampleContent.IDEAS));
+        //Hashmap to be passed
+        HashMap<String, String> filters = new HashMap<>();
+        filters.put("owner","Jim");
+        filters.put("count", "2");
+        //Retrofit Call
+        IdeaService ideaService = ServiceBuilder.buildService(IdeaService.class);
+        Call<List<Idea>> call = ideaService.getIdeas(filters); //modified backend to work
+        call.enqueue(new Callback<List<Idea>>() {
+            @Override
+            public void onResponse(Call<List<Idea>> call, Response<List<Idea>> response) {
+                recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(response.body()));
+            }
+
+            @Override
+            public void onFailure(Call<List<Idea>> call, Throwable t) {
+                Toast.makeText(context,"Request Failed",Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
     }
 
 //region Adapter Region
