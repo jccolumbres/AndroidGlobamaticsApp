@@ -74,7 +74,7 @@ public class IdeaDetailFragment extends Fragment {
 
                 @Override
                 public void onFailure(Call<Idea> call, Throwable t) {
-                    Toast.makeText(context,"Failed to retrieve item",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,"Failed to retrieve idea",Toast.LENGTH_SHORT).show();
 
                 }
             });
@@ -90,18 +90,48 @@ public class IdeaDetailFragment extends Fragment {
                 newIdea.setStatus(ideaStatus.getText().toString());
                 newIdea.setOwner(ideaOwner.getText().toString());
 
-                SampleContent.updateIdea(newIdea);
-                Intent intent = new Intent(getContext(), IdeaListActivity.class);
-                startActivity(intent);
+                IdeaService ideaService = ServiceBuilder.buildService(IdeaService.class);
+                Call<Idea> call = ideaService.updateIdea(
+                        newIdea.getId(),
+                        newIdea.getName(),
+                        newIdea.getDescription(),
+                        newIdea.getStatus(),
+                        newIdea.getOwner()
+                );
+                call.enqueue(new Callback<Idea>() {
+                    @Override
+                    public void onResponse(Call<Idea> call, Response<Idea> response) {
+                        Intent intent = new Intent(getContext(), IdeaListActivity.class);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onFailure(Call<Idea> call, Throwable t) {
+                        Toast.makeText(context,"Failed to update idea",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
         });
 
         deleteIdea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SampleContent.deleteIdea(getArguments().getInt(ARG_ITEM_ID));
-                Intent intent = new Intent(getContext(), IdeaListActivity.class);
-                startActivity(intent);
+                IdeaService ideaService = ServiceBuilder.buildService(IdeaService.class);
+                Call<Void> call = ideaService.deleteIdea("EN",getArguments().getInt(ARG_ITEM_ID));
+                call.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        Intent intent = new Intent(getContext(), IdeaListActivity.class);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Toast.makeText(context,"Failed to delete idea",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
         });
 

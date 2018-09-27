@@ -55,13 +55,13 @@ public class IdeaListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
-        //Hashmap to be passed
-        HashMap<String, String> filters = new HashMap<>();
-        filters.put("owner","Jim");
-        filters.put("count", "2");
+//        //Hashmap to be passed
+//        HashMap<String, String> filters = new HashMap<>();
+//        filters.put("owner","Jim");
+//        filters.put("count", "2");
         //Retrofit Call
         IdeaService ideaService = ServiceBuilder.buildService(IdeaService.class);
-        Call<List<Idea>> call = ideaService.getIdeas(filters); //modified backend to work
+        Call<List<Idea>> call = ideaService.getIdeas("EN"); //modified backend to work
         call.enqueue(new Callback<List<Idea>>() {
             @Override
             public void onResponse(Call<List<Idea>> call, Response<List<Idea>> response) {
