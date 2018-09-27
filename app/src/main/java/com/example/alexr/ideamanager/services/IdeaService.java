@@ -30,14 +30,14 @@ public interface IdeaService {
 //    Call<List<Idea>> getIdeas(@Query("owner") String owner);
 
     //No headers
-//    @GET("ideas")
-//    Call<List<Idea>> getIdeas();
+    @GET("ideas")
+    Call<List<Idea>> getIdeas();
 
     //With Header
-    @Headers("x-device-type: Android")
-    @GET("ideas")
+//    @Headers("x-device-type: Android")
+//    @GET("ideas")
+//    Call<List<Idea>> getIdeas(@Header("Accept-Language") String language);
 
-    Call<List<Idea>> getIdeas(@Header("Accept-Language") String language);
     @GET("ideas/{id}")
     Call<Idea> getIdea(@Path("id") int id);
 

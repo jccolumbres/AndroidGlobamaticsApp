@@ -118,7 +118,7 @@ public class IdeaDetailFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 IdeaService ideaService = ServiceBuilder.buildService(IdeaService.class);
-                Call<Void> call = ideaService.deleteIdea("EN",getArguments().getInt(ARG_ITEM_ID));
+                Call<Void> call = ideaService.deleteIdea(getArguments().getInt(ARG_ITEM_ID));
                 call.enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {

@@ -10,6 +10,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ import com.example.alexr.ideamanager.models.Idea;
 import com.example.alexr.ideamanager.services.IdeaService;
 import com.example.alexr.ideamanager.services.ServiceBuilder;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,6 +52,7 @@ public class IdeaListActivity extends AppCompatActivity {
         });
 
         final RecyclerView recyclerView = (RecyclerView)findViewById(R.id.idea_list);
+
         assert recyclerView != null;
 
         if (findViewById(R.id.idea_detail_container) != null) {
@@ -61,17 +65,39 @@ public class IdeaListActivity extends AppCompatActivity {
 //        filters.put("count", "2");
         //Retrofit Call
         IdeaService ideaService = ServiceBuilder.buildService(IdeaService.class);
-        Call<List<Idea>> call = ideaService.getIdeas("EN"); //modified backend to work
+        final Call<List<Idea>> call = ideaService.getIdeas(); //modified backend to work
+
+        final ProgressBar loading = (ProgressBar) findViewById(R.id.progressIndicator);
+        final Button cancelbtn = (Button)findViewById(R.id.btnCancel);
+
+        cancelbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                call.cancel();
+            }
+        });
+
         call.enqueue(new Callback<List<Idea>>() {
             @Override
             public void onResponse(Call<List<Idea>> call, Response<List<Idea>> response) {
-                recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(response.body()));
+                if (response.isSuccessful()){
+                    recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(response.body()));
+                }else if (response.code() == 401){
+                    Toast.makeText(context,"Your sessions has expired",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(context,"Failed to retrieve items",Toast.LENGTH_SHORT).show();
+                }
+                findViewById(R.id.layout_cancel).setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure(Call<List<Idea>> call, Throwable t) {
-                Toast.makeText(context,"Request Failed",Toast.LENGTH_SHORT).show();
-
+                if (t instanceof IOException) {
+                    Toast.makeText(context, "Connection timed out", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Failed to retrieve items", Toast.LENGTH_SHORT).show();
+                }
+                findViewById(R.id.layout_cancel).setVisibility(View.GONE);
             }
         });
 
