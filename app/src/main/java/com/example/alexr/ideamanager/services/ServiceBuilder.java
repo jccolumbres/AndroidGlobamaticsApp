@@ -15,14 +15,22 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceBuilder {
+    //constant value
     private static final String BASE_URL = "http://10.0.2.2:9000/";
-
+    //singleton
+    private static ServiceBuilder instance = null;
+    public static ServiceBuilder getInstance() {
+        if (instance == null) {
+            instance = new ServiceBuilder();
+        }
+        return instance;
+    }
     //Create Logger
-    private static HttpLoggingInterceptor logger =
+    private HttpLoggingInterceptor logger =
             new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
 
     //Create client to contain logger
-    private static OkHttpClient.Builder okHttp =
+    private OkHttpClient.Builder okHttp =
             new OkHttpClient.Builder()
                     .readTimeout(15, TimeUnit.SECONDS)
                     .addInterceptor(new Interceptor() {
@@ -39,14 +47,14 @@ public class ServiceBuilder {
                     })
                     .addInterceptor(logger);
 
-    private static Retrofit.Builder builder = new Retrofit.Builder()
+    private Retrofit.Builder builder = new Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttp.build());// add this line to build okhttp client along with retrofit
 
-    private static Retrofit retrofit = builder.build();
+    private Retrofit retrofit = builder.build();
 
-    public static <S> S buildService(Class<S> serviceType){
+    public <S> S buildService(Class<S> serviceType){
         return retrofit.create(serviceType);
     }
 }
